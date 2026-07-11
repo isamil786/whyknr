@@ -51,21 +51,53 @@ export default function HomeDisplay({
   const { t, language } = useLanguage();
   const [filterDate, setFilterDate] = useState("");
 
-  const heroArticle = featuredArticles[0] ?? latestArticles[0];
+  const handleDateSelect = (date: string) => {
+    setFilterDate(date);
+    if (date) {
+      // Smooth scroll to news content area on mobile/desktop
+      setTimeout(() => {
+        const contentArea = document.getElementById("main-content-start");
+        if (contentArea) {
+          contentArea.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  };
+
+  // 1. Sync filter: Filter the source news lists by date if a date filter is selected
+  const activeLatest = filterDate
+    ? latestArticles.filter(
+        (article) =>
+          new Date(article.publishedAt).toISOString().split("T")[0] === filterDate
+      )
+    : latestArticles;
+
+  const activeFeatured = filterDate
+    ? featuredArticles.filter(
+        (article) =>
+          new Date(article.publishedAt).toISOString().split("T")[0] === filterDate
+      )
+    : featuredArticles;
+
+  const activeVideo = filterDate
+    ? videoArticles.filter(
+        (article) =>
+          new Date(article.publishedAt).toISOString().split("T")[0] === filterDate
+      )
+    : videoArticles;
+
+  // 2. Re-calculate Hero, Supporting and Regular articles dynamically based on active filtered lists
+  const heroArticle = activeFeatured[0] ?? activeLatest[0];
   const supportingStories =
-    featuredArticles.length > 1
-      ? featuredArticles.slice(1)
-      : latestArticles.slice(1, 4);
-  const regularArticles = latestArticles.filter(
-    (article) => !featuredArticles.some((featured) => featured.id === article.id)
+    activeFeatured.length > 1
+      ? activeFeatured.slice(1)
+      : activeLatest.slice(1, 4);
+
+  const regularArticles = activeLatest.filter(
+    (article) => !activeFeatured.some((featured) => featured.id === article.id)
   );
 
-  const filteredRegularArticles = filterDate
-    ? regularArticles.filter((article) => {
-        const publishDate = new Date(article.publishedAt).toISOString().split("T")[0];
-        return publishDate === filterDate;
-      })
-    : regularArticles;
+  const hasNews = activeLatest.length > 0;
 
   return (
     <div className="bg-stone-50">
@@ -99,12 +131,12 @@ export default function HomeDisplay({
                 </p>
                 <CalendarDropdown
                   selectedDate={filterDate}
-                  onSelectDate={setFilterDate}
+                  onSelectDate={handleDateSelect}
                   language={language}
                 />
               </div>
               <div className="space-y-3">
-                {latestArticles.slice(0, 3).map((article) => {
+                {activeLatest.slice(0, 3).map((article) => {
                   const title =
                     language === "te"
                       ? article.titleTe
@@ -124,178 +156,170 @@ export default function HomeDisplay({
                     </Link>
                   );
                 })}
+                {activeLatest.length === 0 && (
+                  <p className="text-xs text-orange-200 py-4 text-center">
+                    {language === "te"
+                      ? "ఈ తేదీన ఎటువంటి సమాచారం లేదు."
+                      : language === "hi"
+                      ? "इस तारीख को कोई समाचार उपलब्ध नहीं है।"
+                      : "No articles available on this date."}
+                  </p>
+                )}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        {heroArticle && (
-          <section className="mb-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            {(() => {
-              const heroTitle =
-                language === "te"
-                  ? heroArticle.titleTe
-                  : language === "hi"
-                  ? heroArticle.titleHi
-                  : heroArticle.title;
-              const heroExcerpt =
-                language === "te"
-                  ? heroArticle.excerptTe
-                  : language === "hi"
-                  ? heroArticle.excerptHi
-                  : heroArticle.excerpt;
-              return (
-                <Link
-                  href={`/article/${heroArticle.slug}`}
-                  className="group overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm transition hover:shadow-lg"
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden">
-                    <MediaPlayer
-                      mediaType={heroArticle.mediaType}
-                      mediaUrl={heroArticle.mediaUrl}
-                      title={heroTitle}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="mb-3 flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-orange-700">
-                        {t("topStory")}
-                      </span>
-                      <span className="text-sm text-stone-400">
-                        {formatDate(heroArticle.publishedAt)}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl font-black leading-tight text-stone-900 group-hover:text-orange-600">
-                      {heroTitle}
-                    </h2>
-                    <p className="mt-3 text-sm leading-relaxed text-stone-600">
-                      {heroExcerpt ||
-                        (language === "te"
-                          ? "Why.Karimnagar నుండి పూర్తి నివేదిక చదవండి."
-                          : language === "hi"
-                          ? "Why.Karimnagar से पूरी रिपोर्ट पढ़ें।"
-                          : "Read the full report from Why.Karimnagar.")}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })()}
-
-            <div className="space-y-4">
-              {supportingStories.map((article) => {
-                const title =
-                  language === "te"
-                    ? article.titleTe
-                    : language === "hi"
-                    ? article.titleHi
-                    : article.title;
-                return (
-                  <Link
-                    key={article.id}
-                    href={`/article/${article.slug}`}
-                    className="block rounded-2xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-orange-200 hover:shadow-md"
-                  >
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">
-                      {article.category.name}
-                    </p>
-                    <h3 className="mt-2 font-bold text-stone-900">{title}</h3>
-                    <p className="mt-2 text-sm text-stone-500">
-                      {formatDate(article.publishedAt)}
-                    </p>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
+      {/* Target anchor for smooth scroll */}
+      <div id="main-content-start" className="mx-auto max-w-6xl px-4 py-10">
+        {filterDate && (
+          <div className="mb-8 flex items-center justify-between rounded-2xl bg-orange-50 border border-orange-100 p-4 shadow-sm">
+            <span className="text-sm font-semibold text-orange-800">
+              {language === "te" ? "తేదీ ఆధారంగా శోధించబడింది:" : language === "hi" ? "तारीख से फ़िल्टर किया गया:" : "Filtered by Date:"}{" "}
+              <span className="font-bold">{filterDate}</span>
+            </span>
+            <button
+              onClick={() => setFilterDate("")}
+              className="rounded-xl bg-orange-600 px-4 py-2 text-xs font-bold text-white hover:bg-orange-700 transition shadow-sm"
+            >
+              {language === "te" ? "అన్నీ చూపించు" : language === "hi" ? "सभी दिखाएं" : "Clear Filter"}
+            </button>
+          </div>
         )}
 
-        <AdSlot slotId="home-top" className="mb-10" />
+        {!hasNews ? (
+          <div className="rounded-3xl border-2 border-dashed border-stone-200 py-20 text-center">
+            <p className="text-stone-500 font-medium text-lg">
+              {language === "te"
+                ? "ఈ తేదీన ప్రచురించిన వార్తలు లేవు."
+                : language === "hi"
+                ? "इस तारीख को कोई खबर प्रकाशित नहीं हुई।"
+                : "No news articles published on this date."}
+            </p>
+            <button
+              onClick={() => setFilterDate("")}
+              className="mt-4 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-100 hover:opacity-90 transition"
+            >
+              {language === "te" ? "అన్ని వార్తలను చూడండి" : language === "hi" ? "सभी समाचार देखें" : "View All News"}
+            </button>
+          </div>
+        ) : (
+          <>
+            {heroArticle && (
+              <section className="mb-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                {(() => {
+                  const heroTitle =
+                    language === "te"
+                      ? heroArticle.titleTe
+                      : language === "hi"
+                      ? heroArticle.titleHi
+                      : heroArticle.title;
+                  const heroExcerpt =
+                    language === "te"
+                      ? heroArticle.excerptTe
+                      : language === "hi"
+                      ? heroArticle.excerptHi
+                      : heroArticle.excerpt;
+                  return (
+                    <Link
+                      href={`/article/${heroArticle.slug}`}
+                      className="group overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm transition hover:shadow-lg"
+                    >
+                      <div className="relative aspect-[16/10] overflow-hidden">
+                        <MediaPlayer
+                          mediaType={heroArticle.mediaType}
+                          mediaUrl={heroArticle.mediaUrl}
+                          title={heroTitle}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                      <div className="p-6">
+                        <div className="mb-3 flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-orange-700">
+                            {t("topStory")}
+                          </span>
+                          <span className="text-sm text-stone-400">
+                            {formatDate(heroArticle.publishedAt)}
+                          </span>
+                        </div>
+                        <h2 className="text-2xl font-black leading-tight text-stone-900 group-hover:text-orange-600">
+                          {heroTitle}
+                        </h2>
+                        <p className="mt-3 text-sm leading-relaxed text-stone-600">
+                          {heroExcerpt ||
+                            (language === "te"
+                              ? "Why.Karimnagar నుండి పూర్తి నివేదిక చదవండి."
+                              : language === "hi"
+                              ? "Why.Karimnagar से पूरी रिपोर्ट पढ़ें।"
+                              : "Read the full report from Why.Karimnagar.")}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })()}
 
-        {videoArticles.length > 0 && (
-          <section className="mb-10">
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-2xl font-black text-stone-900">
-                <span className="h-6 w-1 rounded-full bg-red-600" />
-                {t("videoHighlights")}
-              </h2>
-            </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              {videoArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <h2 className="flex items-center gap-2 text-2xl font-black text-stone-900">
-              <span className="h-6 w-1 rounded-full bg-orange-600" />
-              {t("latestNews")}
-            </h2>
-            {filterDate && (
-              <div className="flex items-center gap-2.5">
-                <span className="rounded-xl bg-orange-50 border border-orange-200 px-3 py-1.5 text-xs font-bold text-orange-700">
-                  {language === "te" ? "తేదీ:" : language === "hi" ? "तारीख:" : "Filtered Date:"} {filterDate}
-                </span>
-                <button
-                  onClick={() => setFilterDate("")}
-                  className="rounded-xl bg-stone-100 px-3 py-1.5 text-xs font-bold text-stone-600 hover:bg-stone-200 transition"
-                >
-                  {language === "te" ? "అన్నీ" : language === "hi" ? "सभी" : "Show All"}
-                </button>
-              </div>
+                <div className="space-y-4">
+                  {supportingStories.map((article) => {
+                    const title =
+                      language === "te"
+                        ? article.titleTe
+                        : language === "hi"
+                        ? article.titleHi
+                        : article.title;
+                    return (
+                      <Link
+                        key={article.id}
+                        href={`/article/${article.slug}`}
+                        className="block rounded-2xl border border-stone-200 bg-white p-4 shadow-sm transition hover:border-orange-200 hover:shadow-md"
+                      >
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">
+                          {article.category.name}
+                        </p>
+                        <h3 className="mt-2 font-bold text-stone-900">{title}</h3>
+                        <p className="mt-2 text-sm text-stone-500">
+                          {formatDate(article.publishedAt)}
+                        </p>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
             )}
-          </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredRegularArticles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
+            <AdSlot slotId="home-top" className="mb-10" />
 
-          {filteredRegularArticles.length === 0 && (
-            <div className="rounded-2xl border-2 border-dashed border-stone-200 py-16 text-center">
-              <p className="text-stone-500">
-                {filterDate ? (
-                  language === "te"
-                    ? "ఈ తేదీన ప్రచురించిన వార్తలు లేవు."
-                    : language === "hi"
-                    ? "इस तारीख को कोई खबर प्रकाशित नहीं हुई।"
-                    : "No news published on this date."
-                ) : (
-                  language === "te"
-                    ? "ఇంకా కథనాలు లేవు."
-                    : language === "hi"
-                    ? "अभी तक कोई समाचार नहीं है।"
-                    : "No articles yet."
-                )}
-              </p>
-              {filterDate ? (
-                <button
-                  onClick={() => setFilterDate("")}
-                  className="mt-3 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-orange-100 hover:opacity-90 transition"
-                >
-                  {language === "te" ? "అన్ని వార్తలను చూడండి" : language === "hi" ? "सभी समाचार देखें" : "View All News"}
-                </button>
-              ) : (
-                <Link
-                  href="/admin"
-                  className="mt-2 inline-block font-semibold text-orange-600 hover:underline"
-                >
-                  {language === "te"
-                    ? "మీ మొదటి కథనాన్ని ప్రచురించండి →"
-                    : language === "hi"
-                    ? "अपनी पहली खबर प्रकाशित करें →"
-                    : "Publish your first story →"}
-                </Link>
-              )}
-            </div>
-          )}
-        </section>
+            {activeVideo.length > 0 && (
+              <section className="mb-10">
+                <div className="mb-5 flex items-center justify-between">
+                  <h2 className="flex items-center gap-2 text-2xl font-black text-stone-900">
+                    <span className="h-6 w-1 rounded-full bg-red-600" />
+                    {t("videoHighlights")}
+                  </h2>
+                </div>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {activeVideo.map((article) => (
+                    <ArticleCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {regularArticles.length > 0 && (
+              <section>
+                <h2 className="mb-6 flex items-center gap-2 text-2xl font-black text-stone-900">
+                  <span className="h-6 w-1 rounded-full bg-orange-600" />
+                  {t("latestNews")}
+                </h2>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {regularArticles.map((article) => (
+                    <ArticleCard key={article.id} article={article} />
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
