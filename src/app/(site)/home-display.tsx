@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import ArticleCard from "@/components/ArticleCard";
 import MediaPlayer from "@/components/MediaPlayer";
@@ -47,6 +48,7 @@ export default function HomeDisplay({
   videoArticles,
 }: HomeDisplayProps) {
   const { t, language } = useLanguage();
+  const [filterDate, setFilterDate] = useState("");
 
   const heroArticle = featuredArticles[0] ?? latestArticles[0];
   const supportingStories =
@@ -56,6 +58,13 @@ export default function HomeDisplay({
   const regularArticles = latestArticles.filter(
     (article) => !featuredArticles.some((featured) => featured.id === article.id)
   );
+
+  const filteredRegularArticles = filterDate
+    ? regularArticles.filter((article) => {
+        const publishDate = new Date(article.publishedAt).toISOString().split("T")[0];
+        return publishDate === filterDate;
+      })
+    : regularArticles;
 
   return (
     <div className="bg-stone-50">
@@ -214,34 +223,74 @@ export default function HomeDisplay({
         )}
 
         <section>
-          <h2 className="mb-6 flex items-center gap-2 text-2xl font-black text-stone-900">
-            <span className="h-6 w-1 rounded-full bg-orange-600" />
-            {t("latestNews")}
-          </h2>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <h2 className="flex items-center gap-2 text-2xl font-black text-stone-900">
+              <span className="h-6 w-1 rounded-full bg-orange-600" />
+              {t("latestNews")}
+            </h2>
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-stone-400">
+                {language === "te" ? "తేదీ:" : language === "hi" ? "तारीख:" : "Date:"}
+              </span>
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-sm font-semibold text-stone-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 shadow-sm"
+              />
+              {filterDate && (
+                <button
+                  onClick={() => setFilterDate("")}
+                  className="rounded-xl bg-orange-100 px-3 py-1.5 text-sm font-bold text-orange-700 hover:bg-orange-200 transition"
+                >
+                  {language === "te" ? "అన్నీ" : language === "hi" ? "सभी" : "Clear"}
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {regularArticles.map((article) => (
+            {filteredRegularArticles.map((article) => (
               <ArticleCard key={article.id} article={article} />
             ))}
           </div>
-          {regularArticles.length === 0 && featuredArticles.length === 0 && (
+
+          {filteredRegularArticles.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-stone-200 py-16 text-center">
               <p className="text-stone-500">
-                {language === "te"
-                  ? "ఇంకా కథనాలు లేవు."
-                  : language === "hi"
-                  ? "अभी तक कोई समाचार नहीं है।"
-                  : "No articles yet."}
+                {filterDate ? (
+                  language === "te"
+                    ? "ఈ తేదీన ప్రచురించిన వార్తలు లేవు."
+                    : language === "hi"
+                    ? "इस तारीख को कोई खबर प्रकाशित नहीं हुई।"
+                    : "No news published on this date."
+                ) : (
+                  language === "te"
+                    ? "ఇంకా కథనాలు లేవు."
+                    : language === "hi"
+                    ? "अभी तक कोई समाचार नहीं है।"
+                    : "No articles yet."
+                )}
               </p>
-              <Link
-                href="/admin"
-                className="mt-2 inline-block font-semibold text-orange-600 hover:underline"
-              >
-                {language === "te"
-                  ? "మీ మొదటి కథనాన్ని ప్రచురించండి →"
-                  : language === "hi"
-                  ? "अपनी पहली खबर प्रकाशित करें →"
-                  : "Publish your first story →"}
-              </Link>
+              {filterDate ? (
+                <button
+                  onClick={() => setFilterDate("")}
+                  className="mt-3 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-orange-100 hover:opacity-90 transition"
+                >
+                  {language === "te" ? "అన్ని వార్తలను చూడండి" : language === "hi" ? "सभी समाचार देखें" : "View All News"}
+                </button>
+              ) : (
+                <Link
+                  href="/admin"
+                  className="mt-2 inline-block font-semibold text-orange-600 hover:underline"
+                >
+                  {language === "te"
+                    ? "మీ మొదటి కథనాన్ని ప్రచురించండి →"
+                    : language === "hi"
+                    ? "अपनी पहली खबर प्रकाशित करें →"
+                    : "Publish your first story →"}
+                </Link>
+              )}
             </div>
           )}
         </section>

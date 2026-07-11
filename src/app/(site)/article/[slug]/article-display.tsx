@@ -82,6 +82,14 @@ export default function ArticleDisplay({ article, relatedArticles }: Props) {
     }
   }, [article.slug]);
 
+  useEffect(() => {
+    if (article.id) {
+      fetch(`/api/articles/${article.id}/view`, { method: "POST" }).catch((err) =>
+        console.error("Failed to register view:", err)
+      );
+    }
+  }, [article.id]);
+
   return (
     <article className="mx-auto max-w-4xl px-4 py-10">
       <div className="mb-4 flex items-center gap-3">

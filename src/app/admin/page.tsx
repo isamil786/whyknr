@@ -16,16 +16,57 @@ export default async function AdminDashboard() {
     orderBy: { createdAt: "desc" },
   });
 
+  const totalViews = articles.reduce((acc, art) => acc + art.views, 0);
+  const totalArticles = articles.length;
+  const publishedArticles = articles.filter(a => a.published).length;
+  const draftArticles = totalArticles - publishedArticles;
+  const topArticle = articles.length > 0 
+    ? [...articles].sort((a, b) => b.views - a.views)[0] 
+    : null;
+  const categoryCount = new Set(articles.map(a => a.categoryId)).size;
+
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-stone-900">Dashboard</h1>
           <p className="text-sm text-stone-500">
-            Manage your news articles — {articles.length} total
+            Manage your news articles
           </p>
         </div>
-        <AdminActions action="logout" />
+        <Link
+          href="/admin/new"
+          className="rounded-xl bg-gradient-to-r from-orange-600 to-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-orange-100 hover:opacity-90"
+        >
+          + New Article
+        </Link>
+      </div>
+
+      {/* Stats Dashboard */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Total Views</p>
+          <h3 className="mt-2 text-3xl font-black text-stone-900">{totalViews.toLocaleString()}</h3>
+          {topArticle && (
+            <p className="mt-2 text-xs text-stone-500 truncate" title={`${topArticle.title} (${topArticle.views} views)`}>
+              Top: <span className="font-semibold text-orange-600">{topArticle.title}</span> ({topArticle.views})
+            </p>
+          )}
+        </div>
+        
+        <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Total Articles</p>
+          <h3 className="mt-2 text-3xl font-black text-stone-900">{totalArticles}</h3>
+          <p className="mt-2 text-xs text-stone-500">
+            {publishedArticles} Published · {draftArticles} Drafts
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Active Categories</p>
+          <h3 className="mt-2 text-3xl font-black text-stone-900">{categoryCount}</h3>
+          <p className="mt-2 text-xs text-stone-500">Topics covered in news</p>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
@@ -40,6 +81,7 @@ export default async function AdminDashboard() {
                 Media
               </th>
               <th className="px-4 py-3 font-semibold text-stone-600">Status</th>
+              <th className="px-4 py-3 font-semibold text-stone-600">Views</th>
               <th className="hidden px-4 py-3 font-semibold text-stone-600 lg:table-cell">
                 Date
               </th>
@@ -85,6 +127,9 @@ export default async function AdminDashboard() {
                   >
                     {article.published ? "Published" : "Draft"}
                   </span>
+                </td>
+                <td className="px-4 py-3 font-bold text-stone-700">
+                  {article.views}
                 </td>
                 <td className="hidden px-4 py-3 text-stone-400 lg:table-cell">
                   {formatDate(article.publishedAt)}
