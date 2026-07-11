@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { createSlug } from "@/lib/utils";
+import { translateText } from "@/lib/translate";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -47,12 +48,20 @@ export async function POST(request: NextRequest) {
     author,
   } = body;
 
-  if (!title || !titleTe || !titleHi || !content || !contentTe || !contentHi || !categoryId) {
+  if (!title || !content || !categoryId) {
     return NextResponse.json(
-      { error: "Title and content in all three languages, and category are required" },
+      { error: "Title, content, and category are required" },
       { status: 400 }
     );
   }
+
+  // Auto-translate if fields are missing or empty
+  const finalTitleTe = titleTe?.trim() ? titleTe : await translateText(title, "te");
+  const finalTitleHi = titleHi?.trim() ? titleHi : await translateText(title, "hi");
+  const finalExcerptTe = excerptTe?.trim() ? excerptTe : (excerpt?.trim() ? await translateText(excerpt, "te") : null);
+  const finalExcerptHi = excerptHi?.trim() ? excerptHi : (excerpt?.trim() ? await translateText(excerpt, "hi") : null);
+  const finalContentTe = contentTe?.trim() ? contentTe : await translateText(content, "te");
+  const finalContentHi = contentHi?.trim() ? contentHi : await translateText(content, "hi");
 
   let slug = createSlug(title);
   const existing = await prisma.article.findUnique({ where: { slug } });
@@ -63,15 +72,15 @@ export async function POST(request: NextRequest) {
   const article = await prisma.article.create({
     data: {
       title,
-      titleTe,
-      titleHi,
+      titleTe: finalTitleTe,
+      titleHi: finalTitleHi,
       slug,
       excerpt: excerpt || null,
-      excerptTe: excerptTe || null,
-      excerptHi: excerptHi || null,
+      excerptTe: finalExcerptTe,
+      excerptHi: finalExcerptHi,
       content,
-      contentTe,
-      contentHi,
+      contentTe: finalContentTe,
+      contentHi: finalContentHi,
       mediaType: mediaType || "IMAGE",
       mediaUrl: mediaUrl || null,
       categoryId,

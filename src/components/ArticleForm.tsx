@@ -138,28 +138,26 @@ export default function ArticleForm({ categories, initialData }: ArticleFormProp
 
       <div>
         <label className="mb-1.5 block text-sm font-semibold text-stone-700">
-          Title (Telugu) *
+          Title (Telugu) (Optional)
         </label>
         <input
           type="text"
-          required
           value={form.titleTe}
           onChange={(e) => setForm({ ...form, titleTe: e.target.value })}
-          placeholder="సంవాదాన్ని తెలుగులో నమోదు చేయండి..."
+          placeholder="సంవాదాన్ని తెలుగులో నమోదు చేయండి (Auto-translates if empty)..."
           className="w-full rounded-xl border border-stone-300 px-4 py-3 text-lg font-medium outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
       </div>
 
       <div>
         <label className="mb-1.5 block text-sm font-semibold text-stone-700">
-          Title (Hindi) *
+          Title (Hindi) (Optional)
         </label>
         <input
           type="text"
-          required
           value={form.titleHi}
           onChange={(e) => setForm({ ...form, titleHi: e.target.value })}
-          placeholder="समाचार की मुख्य सुर्खियां हिंदी में दर्ज करें..."
+          placeholder="समाचार की मुख्य सुर्खियां हिंदी में दर्ज करें (Auto-translates if empty)..."
           className="w-full rounded-xl border border-stone-300 px-4 py-3 text-lg font-medium outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
       </div>
@@ -293,13 +291,12 @@ export default function ArticleForm({ categories, initialData }: ArticleFormProp
 
       <div>
         <label className="mb-1.5 block text-sm font-semibold text-stone-700">
-          Content (Telugu) *
+          Content (Telugu) (Optional)
         </label>
         <textarea
-          required
           value={form.contentTe}
           onChange={(e) => setForm({ ...form, contentTe: e.target.value })}
-          placeholder="తెలుగులో మీ పూర్తి సమాచార కథను ఇక్కడ రాయండి. మీరు <p>, <strong>, <em> వంటి HTML ట్యాగ్‌లను ఉపయోగించవచ్చు."
+          placeholder="తెలుగులో మీ పూర్తి సమాచార కథను ఇక్కడ రాయండి (Auto-translates if empty)..."
           rows={12}
           className="w-full rounded-xl border border-stone-300 px-4 py-3 font-mono text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />
@@ -310,13 +307,12 @@ export default function ArticleForm({ categories, initialData }: ArticleFormProp
 
       <div>
         <label className="mb-1.5 block text-sm font-semibold text-stone-700">
-          Content (Hindi) *
+          Content (Hindi) (Optional)
         </label>
         <textarea
-          required
           value={form.contentHi}
           onChange={(e) => setForm({ ...form, contentHi: e.target.value })}
-          placeholder="हिंदी में अपना पूरा समाचार लेख यहाँ लिखें। आप फॉर्मेटिंग के लिए <p>, <strong>, <em> जैसे HTML टैग का उपयोग कर सकते हैं।"
+          placeholder="हिंदी में अपना पूरा समाचार लेख यहाँ लिखें (Auto-translates if empty)..."
           rows={12}
           className="w-full rounded-xl border border-stone-300 px-4 py-3 font-mono text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
         />

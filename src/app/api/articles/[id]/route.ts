@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { createSlug } from "@/lib/utils";
+import { translateText } from "@/lib/translate";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -58,19 +59,27 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (slugExists) slug = `${slug}-${Date.now()}`;
   }
 
+  // Auto-translate if fields are missing or empty
+  const finalTitleTe = titleTe?.trim() ? titleTe : (title ? await translateText(title, "te") : existing.titleTe);
+  const finalTitleHi = titleHi?.trim() ? titleHi : (title ? await translateText(title, "hi") : existing.titleHi);
+  const finalExcerptTe = excerptTe?.trim() ? excerptTe : (excerpt?.trim() ? await translateText(excerpt, "te") : (excerpt === null ? null : existing.excerptTe));
+  const finalExcerptHi = excerptHi?.trim() ? excerptHi : (excerpt?.trim() ? await translateText(excerpt, "hi") : (excerpt === null ? null : existing.excerptHi));
+  const finalContentTe = contentTe?.trim() ? contentTe : (content ? await translateText(content, "te") : existing.contentTe);
+  const finalContentHi = contentHi?.trim() ? contentHi : (content ? await translateText(content, "hi") : existing.contentHi);
+
   const article = await prisma.article.update({
     where: { id },
     data: {
       title,
-      titleTe,
-      titleHi,
+      titleTe: finalTitleTe,
+      titleHi: finalTitleHi,
       slug,
       excerpt: excerpt ?? null,
-      excerptTe: excerptTe ?? null,
-      excerptHi: excerptHi ?? null,
+      excerptTe: finalExcerptTe,
+      excerptHi: finalExcerptHi,
       content,
-      contentTe,
-      contentHi,
+      contentTe: finalContentTe,
+      contentHi: finalContentHi,
       mediaType,
       mediaUrl: mediaUrl ?? null,
       categoryId,
