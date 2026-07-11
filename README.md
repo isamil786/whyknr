@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Why.Karimnagar
 
-## Getting Started
+A full-featured local news website for Karimnagar, inspired by [Dakshin News](https://dakshinnews.com). Built for [@why.karimnagar](https://www.instagram.com/why.karimnagar/) on Instagram.
 
-First, run the development server:
+## Features
+
+- **News homepage** with featured stories and category sections
+- **Article pages** with title, photo or video, and rich content
+- **Categories**: Breaking News, Local News, Politics, Events, In Focus, Lifestyle
+- **Admin CMS** at `/admin` to publish, edit, and delete articles
+- **Media support**: upload photos/videos or paste URLs (including YouTube)
+- **Instagram integration** with links to @why.karimnagar
+- **Mobile-responsive** modern UI
+
+## Quick Start
 
 ```bash
+npm install
+npx prisma migrate dev
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Admin Panel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Go to [http://localhost:3000/admin](http://localhost:3000/admin)
+2. Login with password: `admin123` (change in `.env`)
+3. Click **+ New Article** to publish news
 
-## Learn More
+### Creating an Article
 
-To learn more about Next.js, take a look at the following resources:
+| Field | Description |
+|-------|-------------|
+| **Title** | Headline of the news story |
+| **Photo / Video** | Choose media type, upload file or paste URL |
+| **Content** | Full article body (HTML supported) |
+| **Category** | Breaking, Local, Politics, etc. |
+| **Featured** | Show in "In Focus" section on homepage |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Copy `.env.example` to `.env`:
 
-## Deploy on Vercel
+```
+DATABASE_URL="file:./dev.db"
+ADMIN_PASSWORD="admin123"
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js 16 (App Router)
+- Tailwind CSS 4
+- Prisma + SQLite
+- TypeScript
+
+## Project Structure
+
+```
+src/
+  app/
+    (site)/          # Public pages
+    admin/           # CMS dashboard
+    api/             # REST API routes
+  components/        # UI components
+  lib/               # Database, auth, utilities
+```
+
+## Deployment
+
+Works on Vercel, Railway, or any Node.js host. For production:
+
+1. Set `ADMIN_PASSWORD` to a strong password
+2. Use PostgreSQL by changing `DATABASE_URL` in Prisma schema
+3. Configure file upload storage (S3/Cloudinary) for production media
+
+---
+
+**Why.Karimnagar** — Facts · Fearless · Faithful

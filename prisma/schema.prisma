@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  color     String    @default("#E85D04")
+  articles  Article[]
+  createdAt DateTime  @default(now())
+}
+
+model Article {
+  id          String      @id @default(cuid())
+  title       String
+  titleTe     String
+  titleHi     String
+  slug        String      @unique
+  excerpt     String?
+  excerptTe   String?
+  excerptHi   String?
+  content     String
+  contentTe   String
+  contentHi   String
+  mediaType   MediaType   @default(IMAGE)
+  mediaUrl    String?
+  featured    Boolean     @default(false)
+  published   Boolean     @default(true)
+  author      String      @default("Why.Karimnagar Desk")
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  publishedAt DateTime    @default(now())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
