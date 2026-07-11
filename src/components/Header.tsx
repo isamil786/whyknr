@@ -29,7 +29,7 @@ export default function Header() {
       </div>
 
       <div className="mx-auto max-w-6xl px-4 py-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
           <Link href="/" className="group flex items-center gap-3">
             {!logoError ? (
               // eslint-disable-next-line @next/next/no-img-element

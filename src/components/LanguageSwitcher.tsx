@@ -7,7 +7,7 @@ export default function LanguageSwitcher() {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs font-semibold text-stone-600">{t("language")}:</span>
+      <span className="hidden sm:inline text-xs font-semibold text-stone-600">{t("language")}:</span>
       <div className="flex gap-1">
         <button
           onClick={() => setLanguage("en")}
