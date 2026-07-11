@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 type AdminActionsProps =
   | { action: "logout" }
-  | { action: "delete"; articleId: string };
+  | { action: "delete"; articleId: string; className?: string };
 
 export default function AdminActions(props: AdminActionsProps) {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function AdminActions(props: AdminActionsProps) {
         await fetch(`/api/articles/${props.articleId}`, { method: "DELETE" });
         router.refresh();
       }}
-      className="rounded-lg bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-100"
+      className={props.className || "rounded-lg bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 hover:bg-red-100"}
     >
       Delete
     </button>
