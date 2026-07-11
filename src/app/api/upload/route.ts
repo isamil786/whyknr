@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import fs from "fs";
 import { isAdminAuthenticated } from "@/lib/auth";
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
@@ -38,7 +39,12 @@ export async function POST(request: NextRequest) {
 
   const ext = file.name.split(".").pop() || (isVideo ? "mp4" : "jpg");
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  
+  // Use persistent disk path if /data exists in container
+  const usePersistentDisk = fs.existsSync("/data");
+  const uploadDir = usePersistentDisk
+    ? path.join("/data", "uploads")
+    : path.join(process.cwd(), "public", "uploads");
 
   await mkdir(uploadDir, { recursive: true });
 
