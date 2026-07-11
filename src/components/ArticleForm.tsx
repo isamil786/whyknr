@@ -244,7 +244,7 @@ export default function ArticleForm({ categories, initialData }: ArticleFormProp
             Or paste URL
           </label>
           <input
-            type="url"
+            type="text"
             value={form.mediaUrl}
             onChange={(e) => setForm({ ...form, mediaUrl: e.target.value })}
             placeholder={
