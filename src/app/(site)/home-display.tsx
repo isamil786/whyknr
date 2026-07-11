@@ -7,6 +7,7 @@ import MediaPlayer from "@/components/MediaPlayer";
 import { formatDate } from "@/lib/utils";
 import { useLanguage } from "@/lib/language-context";
 import AdSlot from "@/components/AdSlot";
+import CalendarDropdown from "@/components/CalendarDropdown";
 
 type Category = {
   id: string;
@@ -92,10 +93,17 @@ export default function HomeDisplay({
             </div>
 
             <div className="rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-100">
-                {t("todayCoverage")}
-              </p>
-              <div className="mt-3 space-y-3">
+              <div className="mb-3 flex items-center justify-between gap-4">
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-100">
+                  {t("todayCoverage")}
+                </p>
+                <CalendarDropdown
+                  selectedDate={filterDate}
+                  onSelectDate={setFilterDate}
+                  language={language}
+                />
+              </div>
+              <div className="space-y-3">
                 {latestArticles.slice(0, 3).map((article) => {
                   const title =
                     language === "te"
@@ -228,25 +236,19 @@ export default function HomeDisplay({
               <span className="h-6 w-1 rounded-full bg-orange-600" />
               {t("latestNews")}
             </h2>
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-bold uppercase tracking-wider text-stone-400">
-                {language === "te" ? "తేదీ:" : language === "hi" ? "तारीख:" : "Date:"}
-              </span>
-              <input
-                type="date"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
-                className="rounded-xl border border-stone-200 bg-white px-3 py-1.5 text-sm font-semibold text-stone-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 shadow-sm"
-              />
-              {filterDate && (
+            {filterDate && (
+              <div className="flex items-center gap-2.5">
+                <span className="rounded-xl bg-orange-50 border border-orange-200 px-3 py-1.5 text-xs font-bold text-orange-700">
+                  {language === "te" ? "తేదీ:" : language === "hi" ? "तारीख:" : "Filtered Date:"} {filterDate}
+                </span>
                 <button
                   onClick={() => setFilterDate("")}
-                  className="rounded-xl bg-orange-100 px-3 py-1.5 text-sm font-bold text-orange-700 hover:bg-orange-200 transition"
+                  className="rounded-xl bg-stone-100 px-3 py-1.5 text-xs font-bold text-stone-600 hover:bg-stone-200 transition"
                 >
-                  {language === "te" ? "అన్నీ" : language === "hi" ? "सभी" : "Clear"}
+                  {language === "te" ? "అన్నీ" : language === "hi" ? "सभी" : "Show All"}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
