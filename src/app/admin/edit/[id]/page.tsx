@@ -20,7 +20,12 @@ export default async function EditArticlePage({ params }: PageProps) {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-black text-stone-900">Edit Article</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-black text-stone-900">Edit Article</h1>
+        <div className="rounded-xl bg-orange-50 border border-orange-100 px-4 py-2 text-sm font-bold text-orange-700 shadow-sm flex items-center gap-1.5">
+          <span>👁️ {article.views} views</span>
+        </div>
+      </div>
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
         <ArticleForm
           categories={categories}

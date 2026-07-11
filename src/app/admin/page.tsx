@@ -107,7 +107,7 @@ export default async function AdminDashboard() {
               <tr key={article.id} className="hover:bg-stone-50">
                 <td className="px-4 py-3 max-w-xs">
                   <Link
-                    href={`/article/${article.slug}`}
+                    href={`/admin/edit/${article.id}`}
                     className="font-medium text-stone-900 hover:text-orange-600 line-clamp-2"
                   >
                     {article.title}
@@ -185,7 +185,7 @@ export default async function AdminDashboard() {
                 </span>
               </div>
               <Link
-                href={`/article/${article.slug}`}
+                href={`/admin/edit/${article.id}`}
                 className="font-bold text-stone-900 hover:text-orange-600 line-clamp-3 leading-snug"
               >
                 {article.title}
