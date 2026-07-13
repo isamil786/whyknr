@@ -143,7 +143,7 @@ export default function HomeDisplay({
             </div>
 
             {/* Today's coverage card */}
-            <div className="rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+            <div className="relative z-10 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur animate-fade-in-up" style={{ animationDelay: "200ms" }}>
               <div className="mb-3 flex items-center justify-between gap-4">
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-100">
                   {t("todayCoverage")}
