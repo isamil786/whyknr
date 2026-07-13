@@ -106,7 +106,7 @@ export default function HomeDisplay({
   return (
     <div className="bg-stone-50">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-600 via-red-600 to-orange-700 text-white animate-gradient">
+      <section className="relative bg-gradient-to-br from-orange-600 via-red-600 to-orange-700 text-white animate-gradient">
         {/* Decorative shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-white/5" />
