@@ -57,10 +57,17 @@ export default function CalendarDropdown({
 
   const weekDays =
     language === "te"
-      ? ["ఆ", "సో", "మం", "बु", "గు", "శు", "శ"]
+      ? ["ఆ", "సో", "మం", "బు", "గు", "శు", "శ"]
       : language === "hi"
-      ? ["रवि", "सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि"]
+      ? ["र", "सो", "मं", "बु", "गु", "शु", "श"]
       : ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+  const todayText =
+    language === "te"
+      ? "ఈ రోజు"
+      : language === "hi"
+      ? "आज"
+      : "Today";
 
   // Navigation
   const prevMonth = () => {
@@ -69,6 +76,13 @@ export default function CalendarDropdown({
 
   const nextMonth = () => {
     setViewDate(new Date(year, month + 1, 1));
+  };
+
+  const goToToday = () => {
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    onSelectDate(todayStr);
+    setViewDate(new Date(now.getFullYear(), now.getMonth(), 1));
+    setIsOpen(false);
   };
 
   const handleDateSelect = (dayNum: number) => {
@@ -82,7 +96,7 @@ export default function CalendarDropdown({
   const dayCells = [];
   // Offset blanks
   for (let i = 0; i < startDayIndex; i++) {
-    dayCells.push(<div key={`empty-${i}`} className="h-7 w-7" />);
+    dayCells.push(<div key={`empty-${i}`} className="h-8 w-8" />);
   }
   // Days of month
   for (let d = 1; d <= daysInMonth; d++) {
@@ -100,12 +114,12 @@ export default function CalendarDropdown({
         key={`day-${d}`}
         type="button"
         onClick={() => handleDateSelect(d)}
-        className={`h-7 w-7 rounded-full text-xs font-bold transition flex items-center justify-center ${
+        className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold transition-all duration-200 ${
           isSelected
-            ? "bg-orange-600 text-white"
+            ? "bg-gradient-to-br from-orange-500 to-red-500 text-white shadow-md shadow-orange-200/50 scale-105"
             : isToday
-            ? "bg-orange-100 text-orange-700 border border-orange-400"
-            : "text-stone-700 hover:bg-stone-100"
+            ? "bg-orange-50 text-orange-700 ring-1 ring-orange-300 font-bold"
+            : "text-stone-700 hover:bg-orange-50 hover:text-orange-600"
         }`}
       >
         {d}
@@ -119,7 +133,11 @@ export default function CalendarDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-white border border-white/20 hover:bg-white/25 transition shadow-sm"
+        className={`flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 text-white transition-all duration-200 shadow-sm ${
+          isOpen
+            ? "bg-white/25 scale-95"
+            : "bg-white/15 hover:bg-white/25 hover:scale-105"
+        }`}
         title="Filter coverage by date"
       >
         <svg
@@ -140,31 +158,40 @@ export default function CalendarDropdown({
 
       {/* Expanded Monthly Grid Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 z-50 w-64 rounded-2xl border border-stone-200 bg-white p-4 shadow-xl animate-in fade-in slide-in-from-top-1 duration-200">
+        <div className="absolute right-0 mt-2 z-50 w-72 rounded-2xl border border-stone-200 bg-white p-4 shadow-2xl animate-slide-down">
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
               onClick={prevMonth}
-              className="p-1 rounded-lg hover:bg-stone-100 text-stone-600 transition"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 transition hover:bg-stone-100 hover:text-stone-700"
             >
-              ←
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
             </button>
-            <span className="text-sm font-black text-stone-800">
+            <span
+              className="text-sm font-bold text-stone-800"
+              style={{ fontFamily: "var(--font-outfit), var(--font-inter), system-ui, sans-serif" }}
+            >
               {monthNames[month]} {year}
             </span>
             <button
               type="button"
               onClick={nextMonth}
-              className="p-1 rounded-lg hover:bg-stone-100 text-stone-600 transition"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 transition hover:bg-stone-100 hover:text-stone-700"
             >
-              →
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
             </button>
           </div>
 
           {/* Weekday headers */}
-          <div className="grid grid-cols-7 gap-1 text-center text-xxs font-bold text-stone-400 mb-2">
+          <div className="grid grid-cols-7 gap-1 text-center mb-2">
             {weekDays.map((wd, index) => (
-              <div key={`wd-${index}`}>{wd}</div>
+              <div key={`wd-${index}`} className="text-[10px] font-bold uppercase tracking-wider text-stone-400 py-1">
+                {wd}
+              </div>
             ))}
           </div>
 
@@ -173,20 +200,30 @@ export default function CalendarDropdown({
             {dayCells}
           </div>
 
-          {selectedDate && (
-            <div className="mt-3 pt-3 border-t border-stone-100 flex justify-between items-center">
-              <span className="text-xxs font-medium text-stone-500">
-                Filtered: <span className="font-bold text-orange-600">{selectedDate}</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => onSelectDate("")}
-                className="text-xxs font-bold text-red-500 hover:text-red-700 transition"
-              >
-                Clear
-              </button>
-            </div>
-          )}
+          {/* Footer actions */}
+          <div className="mt-3 flex items-center justify-between gap-2 border-t border-stone-100 pt-3">
+            <button
+              type="button"
+              onClick={goToToday}
+              className="rounded-lg bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-600 transition hover:bg-orange-100"
+            >
+              {todayText}
+            </button>
+            {selectedDate && (
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-medium text-stone-400">
+                  {selectedDate}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { onSelectDate(""); setIsOpen(false); }}
+                  className="rounded-lg bg-red-50 px-2 py-1 text-[10px] font-bold text-red-500 transition hover:bg-red-100"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

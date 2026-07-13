@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/lib/language-context";
@@ -8,52 +8,91 @@ import { useLanguage } from "@/lib/language-context";
 export default function Header() {
   const { t, language } = useLanguage();
   const [logoError, setLogoError] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/95 backdrop-blur-md">
-      <div className="bg-gradient-to-r from-orange-600 via-red-600 to-orange-700 text-white">
+    <header
+      className={`sticky top-0 z-50 transition-shadow duration-300 ${
+        scrolled ? "shadow-lg shadow-stone-900/5" : ""
+      }`}
+    >
+      {/* Top accent bar */}
+      <div className="bg-gradient-to-r from-orange-600 via-red-600 to-orange-700 text-white animate-gradient">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-1.5 text-xs">
-          <span>{t("voice")} · {language === "te" ? "తెలంగాణ" : language === "hi" ? "तेलंगाना" : "Telangana"}</span>
+          <span className="font-medium tracking-wide">
+            {t("voice")} ·{" "}
+            {language === "te"
+              ? "తెలంగాణ"
+              : language === "hi"
+              ? "तेलंगाना"
+              : "Telangana"}
+          </span>
           <div className="flex items-center gap-4">
             <a
               href="https://www.instagram.com/why.karimnagar/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition hover:text-orange-200"
+              className="flex items-center gap-1.5 font-medium transition hover:text-orange-200"
             >
               <InstagramIcon />
-              @why.karimnagar
+              <span className="hidden sm:inline">@why.karimnagar</span>
             </a>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-4">
-        <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
-          <Link href="/" className="group flex items-center gap-3">
-            {!logoError ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src="/logo.jpg"
-                alt="Why.Karimnagar Logo"
-                className="h-12 w-12 rounded-xl object-cover shadow-lg shadow-orange-100 transition group-hover:scale-105"
-                onError={() => setLogoError(true)}
-              />
-            ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-lg font-black text-white shadow-lg shadow-orange-200 transition group-hover:scale-105">
-                W
+      {/* Main header */}
+      <div className="border-b border-stone-200/80 bg-white/95 backdrop-blur-xl">
+        <div className="mx-auto max-w-6xl px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
+            {/* Logo */}
+            <Link href="/" className="group flex items-center gap-3">
+              {!logoError ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src="/logo.jpg"
+                  alt="Why.Karimnagar Logo"
+                  className="h-11 w-11 rounded-xl object-cover shadow-md shadow-orange-100 ring-2 ring-orange-100 transition duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-orange-200"
+                  onError={() => setLogoError(true)}
+                />
+              ) : (
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-lg font-black text-white shadow-md shadow-orange-200 transition duration-300 group-hover:scale-105 group-hover:shadow-lg">
+                  W
+                </div>
+              )}
+              <div>
+                <h1
+                  className="text-xl font-black tracking-tight text-stone-900 transition group-hover:text-orange-600 sm:text-2xl"
+                  style={{ fontFamily: "var(--font-outfit), var(--font-inter), system-ui, sans-serif" }}
+                >
+                  Why<span className="text-orange-600">.</span>Karimnagar
+                </h1>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-400">
+                  {language === "te"
+                    ? "విషయాలు · నిర్భయ · విశ్వాసాన్ని"
+                    : language === "hi"
+                    ? "तथ्य · निर्भीक · निष्पक्ष"
+                    : "Facts · Fearless · Faithful"}
+                </p>
               </div>
-            )}
-            <div>
-              <h1 className="text-2xl font-black tracking-tight text-stone-900 group-hover:text-orange-600 transition">
-                Why<span className="text-orange-600">.</span>Karimnagar
-              </h1>
-              <p className="text-xs font-medium text-stone-500">
-                {language === "te" ? "విషయాలు · నిర్భయ · విశ్వాసాన్ని" : language === "hi" ? "तथ्य · निर्भीक · निष्पक्ष" : "Facts · Fearless · Faithful"}
-              </p>
-            </div>
-          </Link>
-          <LanguageSwitcher />
+            </Link>
+
+            {/* Language switcher */}
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
     </header>
@@ -67,4 +106,3 @@ function InstagramIcon() {
     </svg>
   );
 }
-
