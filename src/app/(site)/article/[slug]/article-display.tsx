@@ -105,6 +105,35 @@ export default function ArticleDisplay({ article, relatedArticles }: Props) {
     }
   }, [article.id]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent Ctrl+C / Cmd+C
+      if ((e.ctrlKey || e.metaKey) && e.key === "c") {
+        e.preventDefault();
+      }
+      // Prevent Ctrl+U / Cmd+U (View Source shortcut)
+      if ((e.ctrlKey || e.metaKey) && e.key === "u") {
+        e.preventDefault();
+      }
+      // Prevent Ctrl+A / Cmd+A
+      if ((e.ctrlKey || e.metaKey) && e.key === "a") {
+        e.preventDefault();
+      }
+    };
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("contextmenu", handleContextMenu);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, []);
+
   return (
     <>
       <ReadingProgressBar />
@@ -156,7 +185,12 @@ export default function ArticleDisplay({ article, relatedArticles }: Props) {
 
         {/* Article Content */}
         <div
-          className="article-content mt-10"
+          className="article-content mt-10 select-none"
+          style={{ userSelect: "none", WebkitUserSelect: "none", MozUserSelect: "none", msUserSelect: "none" }}
+          onCopy={(e) => e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()}
+          onCut={(e) => e.preventDefault()}
+          onDragStart={(e) => e.preventDefault()}
           dangerouslySetInnerHTML={{ __html: content }}
         />
 
