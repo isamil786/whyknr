@@ -138,7 +138,10 @@ export default function ArticleDisplay({ article, relatedArticles }: Props) {
     <>
       <ReadingProgressBar />
 
-      <article className="mx-auto max-w-4xl px-4 py-10 animate-fade-in-up">
+      <article
+        className="mx-auto max-w-4xl px-4 py-10 animate-fade-in-up select-none"
+        style={{ userSelect: "none", WebkitUserSelect: "none", MozUserSelect: "none", msUserSelect: "none" }}
+      >
         {/* Date only */}
         <div className="mb-4 flex flex-wrap items-center gap-3">
           <time className="text-sm text-stone-400">
