@@ -158,16 +158,7 @@ export default function CalendarDropdown({
 
       {/* Expanded Monthly Grid Dropdown */}
       {isOpen && (
-        <>
-          {/* Mobile bottom drawer backdrop */}
-          <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
-            onClick={() => setIsOpen(false)}
-          />
-
-          <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl border-t border-stone-200 bg-white p-5 pb-8 shadow-2xl animate-in slide-in-from-bottom duration-300 md:absolute md:bottom-auto md:left-auto md:right-0 md:top-full md:mt-2 md:w-72 md:rounded-2xl md:border md:pb-4 md:shadow-xl md:animate-slide-down">
-            {/* Drag Handle Indicator for mobile */}
-            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-stone-300 md:hidden" />
+        <div className="absolute right-0 mt-2 z-50 w-72 rounded-2xl border border-stone-200 bg-white p-4 shadow-2xl animate-slide-down">
 
             <div className="flex items-center justify-between mb-3">
               <button
@@ -233,9 +224,7 @@ export default function CalendarDropdown({
                   </button>
                 </div>
               )}
-            </div>
           </div>
-        </>
       )}
     </div>
   );
